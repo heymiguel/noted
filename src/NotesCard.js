@@ -11,24 +11,30 @@ class NoteCard extends Component {
   }
 
   componentDidMount() {
-
     this.setState( {
       note: this.props.note
     } );
-    console.log( this.state );
   }
 
   saveNote( e ) {
     e.preventDefault();
+    const dbRef = firebase.database().ref( this.props.note.key );
+    dbRef.update( {
+      title: this.noteTitle.value,
+      text: this.noteText.value
+    } )
 
+    this.setState( {
+      editing: false
+    } )
   }
 
   render() {
     let isEditing = (
       <div>
-        <h4>{this.state.note.title}</h4>
+        <h4>{this.props.note.title}</h4>
         <p>
-          {this.state.note.text}
+          {this.props.note.text}
         </p>
       </div>
     )
@@ -36,10 +42,10 @@ class NoteCard extends Component {
       isEditing = (
         <form onSubmit={this.saveNote}>
           <div>
-            <input type="text" defaultValue={this.state.note.title} name='title' ref={ref = this.noteTitle = ref} />
+            <input type="text" defaultValue={this.props.note.title} name='title' ref={ref => this.noteTitle = ref} />
           </div>
           <div>
-            <input type="text" defaultValue={this.state.note.text} name='text' ref={ref = this.noteText = ref} />
+            <input type="text" defaultValue={this.props.note.text} name='text' ref={ref => this.noteText = ref} />
           </div>
           <input type="submit" value="Done editing!" />
         </form>
@@ -48,7 +54,7 @@ class NoteCard extends Component {
     return (
       <div className="noteCard">
         <i className="fa fa-edit" onClick={() => this.setState( { editing: true } )}></i>
-        <i className="fa fa-times" onClick={() => this.props.removeNote( this.state.note.key )}></i>
+        <i className="fa fa-times" onClick={() => this.props.removeNote( this.props.note.key )}></i>
         {isEditing}
       </div>
     );
