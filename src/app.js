@@ -33,7 +33,7 @@ class App extends React.Component {
   componentDidMount() {
     firebase.auth().onAuthStateChanged(( user ) => {
       if ( user ) {
-        firebase.database().ref().on( 'value', ( res ) => {
+        firebase.database().ref( `users/${ user.uid }/notes` ).on( 'value', ( res ) => {
           const userData = res.val();
           const dataArray = [];
           for ( let objectKey in userData ) {
@@ -83,8 +83,9 @@ class App extends React.Component {
       title: this.noteTitle.value,
       text: this.noteText.value
     };
-
-    const dbRef = firebase.database().ref();
+    const userId = firebase.auth().currentUser.uid;
+    console.log( userId );
+    const dbRef = firebase.database().ref( `users/${ userId }/notes` );
     dbRef.push( note ); // adds the note.
 
     this.noteTitle.value = "";
@@ -143,7 +144,8 @@ class App extends React.Component {
   }
 
   removeNote( noteId ) {
-    const dbRef = firebase.database().ref( noteId ); // key here tells firebase which key
+    const userId = firebase.auth().currentUser.uid;
+    const dbRef = firebase.database().ref( `users/${ userId }/notes` ); // key here tells firebase which key
     dbRef.remove();
   }
 
